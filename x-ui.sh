@@ -137,11 +137,11 @@ uninstall() {
         fi
         return 0
     fi
-    systemctl stop x-ui
-    systemctl disable x-ui
+    service x-ui stop
+    service x-ui disable 
     rm /etc/systemd/system/x-ui.service -f
-    systemctl daemon-reload
-    systemctl reset-failed
+    service daemon-reload
+    service reset-failed
     rm /etc/x-ui/ -rf
     rm /usr/local/x-ui/ -rf
 
@@ -207,7 +207,7 @@ start() {
         echo ""
         LOGI "面板已运行，无需再次启动，如需重启请选择重启"
     else
-        systemctl start x-ui
+        service x-ui start
         sleep 2
         check_status
         if [[ $? == 0 ]]; then
@@ -228,7 +228,7 @@ stop() {
         echo ""
         LOGI "面板已停止，无需再次停止"
     else
-        systemctl stop x-ui
+        service x-ui stop
         sleep 2
         check_status
         if [[ $? == 1 ]]; then
@@ -244,7 +244,7 @@ stop() {
 }
 
 restart() {
-    systemctl restart x-ui
+    service x-ui restart
     sleep 2
     check_status
     if [[ $? == 0 ]]; then
@@ -258,14 +258,14 @@ restart() {
 }
 
 status() {
-    systemctl status x-ui -l
+    service x-ui status -l
     if [[ $# == 0 ]]; then
         before_show_menu
     fi
 }
 
 enable() {
-    systemctl enable x-ui
+    service x-ui enable
     if [[ $? == 0 ]]; then
         LOGI "x-ui 设置开机自启成功"
     else
@@ -278,7 +278,7 @@ enable() {
 }
 
 disable() {
-    systemctl disable x-ui
+    service x-ui disable
     if [[ $? == 0 ]]; then
         LOGI "x-ui 取消开机自启成功"
     else
@@ -327,7 +327,7 @@ check_status() {
     if [[ ! -f /etc/systemd/system/x-ui.service ]]; then
         return 2
     fi
-    temp=$(systemctl status x-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+    temp=$(service x-ui status | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
     if [[ x"${temp}" == x"running" ]]; then
         return 0
     else
@@ -336,7 +336,7 @@ check_status() {
 }
 
 check_enabled() {
-    temp=$(systemctl is-enabled x-ui)
+    temp=$(service x-ui is-enabled)
     if [[ x"${temp}" == x"enabled" ]]; then
         return 0
     else
@@ -686,7 +686,7 @@ update_geo() {
         rm -f ${PATH_FOR_GEO_SITE}.bak
     fi
     #restart x-ui
-    systemctl restart x-ui
+    service x-ui restart
 }
 
 enable_auto_update_geo() {
@@ -730,7 +730,7 @@ clear_log() {
             LOGE "清除xray日志文件:${filePath}失败"
         else
             LOGI "清除xray日志文件:${filePath}成功"
-            systemctl restart x-ui
+            service x-ui restart
         fi
     else
         LOGI "当前日志大小为${fileSize}M,小于${DEFAULT_LOG_FILE_DELETE_TRIGGER}M,将不会清除"
